@@ -170,8 +170,10 @@ class RedisService:
     # ─────────────────────────────────────────────────────────
 
     def _blacklist_key(self, token: str) -> str:
-        """生成黑名单 Key（只存 token 前40字符作为标识，节省内存）"""
-        return f"token_blacklist:{token[:40]}"
+        """生成黑名单 Key（使用完整 Token 的 SHA256 哈希，避免前缀碰撞导致误判）"""
+        import hashlib
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        return f"token_blacklist:{token_hash}"
 
     async def blacklist_token(self, token: str) -> bool:
         """
