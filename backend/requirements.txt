@@ -1,0 +1,42 @@
+# FastAPI核心
+fastapi
+uvicorn[standard]
+pydantic>=2.0
+pydantic-settings
+
+# LangChain和AI
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+dashscope>=1.20.0
+
+# RAG相关
+faiss-cpu          # 本地向量数据库（轻量，无需额外服务）
+# DashScopeEmbeddings 已内置于 langchain-community，无需单独安装 langchain-dashscope
+
+# Redis缓存
+redis>=5.0.0       # Redis异步客户端
+
+# 数据库驱动
+motor              # MongoDB异步驱动
+aiomysql           # MySQL异步驱动
+sqlalchemy[asyncio]>=2.0  # SQLAlchemy异步支持
+
+# 认证和安全
+python-jose[cryptography]  # JWT token
+passlib[bcrypt]    # 密码加密
+bcrypt==4.0.1          # 必须锁定此版本,新版与passlib不兼容
+python-multipart   # 表单数据解析
+
+# 其他
+python-dotenv
+email-validator    # 邮箱验证
+
+# 工具库
+httpx
+python-docx  # Word文件解析
+Pillow  # 图片处理
+PyMuPDF  # PDF处理
+
+# 数据库连接依赖
+pymysql

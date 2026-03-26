@@ -1,0 +1,65 @@
+# 一键部署：AI 健康管理咨询平台
+# 开发者：baoozak
+
+version: '3.8'
+
+services:
+  # 1. 后端服务 (FastAPI)
+  backend:
+    image: ghcr.io/baoozak/health-chat-backend:latest
+    container_name: health-chat-backend
+    restart: always
+    environment:
+      - DASHSCOPE_API_KEY=你的阿里云百炼密钥
+      - MYSQL_HOST=mysql
+      - MYSQL_DATABASE=langchain_chat
+      - MONGODB_HOST=mongodb
+      - REDIS_HOST=redis
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - mongodb
+      - redis
+
+  # 2. 前端服务 (Nginx)
+  frontend:
+    image: ghcr.io/baoozak/health-chat-frontend:latest
+    container_name: health-chat-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # 3. MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: health-chat-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: langchain_chat
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  # 4. MongoDB
+  mongodb:
+    image: mongo:6.0
+    container_name: health-chat-mongodb
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+
+  # 5. Redis
+  redis:
+    image: redis:latest
+    container_name: health-chat-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql_data:
+  mongodb_data:

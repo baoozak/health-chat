@@ -1,0 +1,91 @@
+# ===== Python (backend) =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+env/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ===== Node.js (frontend) =====
+node_modules/
+dist-ssr/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ===== 环境变量 =====
+.env
+*.local
+
+# ===== 日志 =====
+*.log
+logs/
+
+# ===== 数据库 =====
+*.db
+*.sqlite3
+
+# ===== 缓存 =====
+.cache/
+*.cache
+
+# ===== IDE =====
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== AI 工具 =====
+.agent/
+
+# ===== 上传文件 =====
+uploads/
+
+# ===== 项目专属（私有文件）=====
+AI健康管理助手项目报告.md
+*项目报告*.md
+环境配置说明.txt
+
+# ===== 部署与运维（仅本地，不上传）=====
+deploy/
+.dockerignore
+**/.dockerignore
+
+# ===== AI 知识库与向量库（自动生成）=====
+backend/vector_stores/
+
+# ===== Documentation =====
+docs/
