@@ -24,6 +24,8 @@ services:
       - SECRET_KEY=your-secret-key-change-this-in-production
     ports:
       - "8000:8000"
+    volumes:
+      - vector_data:/app/vector_stores
     depends_on:
       - mysql
       - mongodb
@@ -70,3 +72,4 @@ services:
 volumes:
   mysql_data:
   mongodb_data:
+  vector_data:
