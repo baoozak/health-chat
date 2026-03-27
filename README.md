@@ -156,11 +156,15 @@ git clone https://github.com/baoozak/health-chat.git
 cd health-chat
 ```
 
-#### 2. 配置环境
+#### 2. 配置环境 (必做)
+本仓库上传的是 `.env.txt` 模板。**你需要将它们统一改为 `.env` 并在里面填入你的配置：**
+
 ```bash
-# 复制环境配置模板
+# 后端配置
 cp backend/.env.txt backend/.env
-# 编辑 .env，填写内容
+
+# 前端配置（Vite 自动读取）
+cp frontend/.env.txt frontend/.env
 ```
 
 #### 3. 环境准备
