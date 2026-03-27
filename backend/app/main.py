@@ -65,28 +65,18 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# 配置 CORS - 解决 Docker 部署时的跨域问题
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 允许所有来源 (Docker 内部或宿主机)
-    allow_credentials=True,
-    allow_methods=["*"],  # 允许所有方法 (GET, POST, OPTIONS 等)
-    allow_headers=["*"],  # 允许所有头 (Authorization 等)
-)
-
 # 引入配置
 from config.settings import settings
 
-# CORS 来源列表（已经是列表格式）
+# 配置 CORS 中间件（仅添加一次，避免多个 CORS 中间件冲突）
 cors_origins = settings.CORS_ORIGINS
 logger.info(f"CORS allowed origins: {cors_origins}")
 
-# 配置CORS中间件,允许前端跨域访问
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],  # 允许所有HTTP方法
+    allow_methods=["*"],  # 允许所有 HTTP 方法
     allow_headers=["*"],  # 允许所有请求头
 )
 

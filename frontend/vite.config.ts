@@ -12,6 +12,6 @@ export default defineConfig({
     })
   ],
   server: {
-    allowedHosts: true  // 允许所有域名访问（用于 cpolar 等内网穿透）
+    allowedHosts: true  // 允许所有域名访问
   },
 })

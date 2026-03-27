@@ -55,9 +55,11 @@ class Settings(BaseSettings):
     
     # CORS配置
     CORS_ORIGINS: list = [
-        "http://localhost:5173",
+        "http://localhost",          # Docker 部署 (Nginx 默认80端口)
+        "http://localhost:80",       # Docker 部署 (显式80端口)
+        "http://localhost:5173",     # 本地开发 (Vite)
         "http://localhost:5174",
-        "https://1e9002bf.r34.cpolar.top",  # cpolar 前端公网地址
+        "http://127.0.0.1:5173",    # 本地开发 (127地址)
     ]
     
     class Config:
