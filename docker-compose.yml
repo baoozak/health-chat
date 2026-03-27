@@ -12,9 +12,16 @@ services:
     environment:
       - DASHSCOPE_API_KEY=你的阿里云百炼密钥
       - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
       - MYSQL_DATABASE=langchain_chat
       - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MONGODB_DATABASE=langchain_chat
       - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=your-secret-key-change-this-in-production
     ports:
       - "8000:8000"
     depends_on:

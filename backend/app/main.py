@@ -59,10 +59,19 @@ async def lifespan(app: FastAPI):
 
 # 创建FastAPI应用实例
 app = FastAPI(
-    title="个人健康管理咨询API",
-    description="基于AI的个人健康管理和咨询服务",
+    title="AI健康管理助手 API",
+    description="支持会话历史、RAG、OCR等专业功能的AI健康管理后端系统",
     version="1.0.0",
-    lifespan=lifespan  # 添加生命周期管理
+    lifespan=lifespan
+)
+
+# 配置 CORS - 解决 Docker 部署时的跨域问题
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有来源 (Docker 内部或宿主机)
+    allow_credentials=True,
+    allow_methods=["*"],  # 允许所有方法 (GET, POST, OPTIONS 等)
+    allow_headers=["*"],  # 允许所有头 (Authorization 等)
 )
 
 # 引入配置
