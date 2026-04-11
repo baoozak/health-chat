@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     REDIS_TOKEN_BLACKLIST_TTL: int = 60 * 24 * 7  # Token黑名单TTL与Token有效期一致
 
     # RAG配置
-    RAG_VECTOR_STORE_DIR: str = "vector_stores"   # FAISS向量库存储根目录
+    RAG_VECTOR_STORE_DIR: str = "vector_stores"   # Chroma向量库存储根目录
     RAG_CHUNK_SIZE: int = 500                     # 文本切分块大小（字符）
     RAG_CHUNK_OVERLAP: int = 50                   # 相邻块重叠字符数
     RAG_TOP_K: int = 3                            # 检索返回的最相关块数量

@@ -1,6 +1,6 @@
 """
 RAG（检索增强生成）服务 —— 全局健康知识库
-基于 LangChain + FAISS + DashScope Embeddings 实现
+基于 LangChain + Chroma + DashScope Embeddings 实现
 
 【设计定位】
   全局知识库：由管理员通过 build_knowledge_base.py 脚本预置健康文档
@@ -11,12 +11,12 @@ RAG（检索增强生成）服务 —— 全局健康知识库
     健康文档（TXT/PDF/Word）
       → RecursiveCharacterTextSplitter 切分 chunk
       → DashScope text-embedding-v2 向量化
-      → FAISS 本地持久化（backend/vector_stores/global/）
+      → Chroma 本地持久化（backend/vector_stores/global/）
 
   【检索阶段 - 用户对话时自动触发】
     用户问题
       → DashScope text-embedding-v2 向量化
-      → FAISS 相似度搜索（Top-K）
+      → Chroma 相似度搜索（Top-K）
       → 返回最相关的健康知识片段
       → 拼入 Prompt 供 AI 参考作答
 """
@@ -26,7 +26,7 @@ from typing import List, Optional
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import DashScopeEmbeddings
 
 from config.settings import settings
@@ -35,6 +35,9 @@ logger = logging.getLogger(__name__)
 
 # 全局知识库的固定标识（所有用户共享）
 GLOBAL_STORE_ID = "global"
+
+# Chroma collection 名称
+CHROMA_COLLECTION_NAME = "health_knowledge"
 
 
 class RAGService:
@@ -47,7 +50,7 @@ class RAGService:
 
     def __init__(self):
         # 内存缓存：避免重复从磁盘加载
-        self._store: Optional[FAISS] = None
+        self._store: Optional[Chroma] = None
 
         # 文本分割器（对中文分段友好）
         self._splitter = RecursiveCharacterTextSplitter(
@@ -72,12 +75,12 @@ class RAGService:
         """获取全局知识库在磁盘上的路径"""
         return os.path.join(settings.rag_vector_store_path, GLOBAL_STORE_ID)
 
-    def _load_store(self) -> Optional[FAISS]:
+    def _load_store(self) -> Optional[Chroma]:
         """
-        加载全局 FAISS 向量库（内存缓存优先）
+        加载全局 Chroma 向量库（内存缓存优先）
 
         Returns:
-            FAISS 实例，知识库不存在时返回 None
+            Chroma 实例，知识库不存在时返回 None
         """
         if self._store is not None:
             return self._store
@@ -85,11 +88,16 @@ class RAGService:
         store_path = self._get_store_path()
         if os.path.exists(store_path):
             try:
-                self._store = FAISS.load_local(
-                    store_path,
-                    self._embeddings,
-                    allow_dangerous_deserialization=True,  # 本地可信文件
+                self._store = Chroma(
+                    collection_name=CHROMA_COLLECTION_NAME,
+                    embedding_function=self._embeddings,
+                    persist_directory=store_path,
                 )
+                # 检查 collection 中是否有文档
+                if self._store._collection.count() == 0:
+                    logger.debug("Chroma collection 为空，视为未建库")
+                    self._store = None
+                    return None
                 logger.info(f"全局知识库已从磁盘加载: {store_path}")
                 return self._store
             except Exception as e:
@@ -99,13 +107,28 @@ class RAGService:
         logger.debug("全局知识库尚未建立，请运行 build_knowledge_base.py")
         return None
 
-    def _save_store(self, store: FAISS):
-        """将 FAISS 向量库持久化到磁盘"""
+    def _create_store(self, documents: List[Document]) -> Chroma:
+        """
+        根据文档列表创建新的 Chroma 向量库并持久化到磁盘
+
+        Args:
+            documents: 待索引的文档列表
+
+        Returns:
+            新创建的 Chroma 实例
+        """
         store_path = self._get_store_path()
         os.makedirs(store_path, exist_ok=True)
-        store.save_local(store_path)
+
+        store = Chroma.from_documents(
+            documents=documents,
+            embedding=self._embeddings,
+            collection_name=CHROMA_COLLECTION_NAME,
+            persist_directory=store_path,
+        )
         self._store = store
-        logger.info(f"全局知识库已保存: {store_path}")
+        logger.info(f"全局知识库已创建并保存: {store_path}")
+        return store
 
     async def add_documents(
         self,
@@ -152,20 +175,17 @@ class RAGService:
             if not all_documents:
                 return 0
 
-            # 向量化 + 存入 FAISS
+            # 向量化 + 存入 Chroma
             existing_store = self._load_store()
             if existing_store is None:
                 # 首次建库
-                new_store = await FAISS.afrom_documents(all_documents, self._embeddings)
+                self._create_store(all_documents)
                 logger.info("创建新的全局知识库")
             else:
-                # 增量追加
-                new_fragment = await FAISS.afrom_documents(all_documents, self._embeddings)
-                existing_store.merge_from(new_fragment)
-                new_store = existing_store
+                # 增量追加：直接向现有 collection 添加文档
+                existing_store.add_documents(all_documents)
                 logger.info("增量追加到现有全局知识库")
 
-            self._save_store(new_store)
             logger.info(f"全局知识库更新完成，本次新增 {len(all_documents)} 个 chunk")
             return len(all_documents)
 

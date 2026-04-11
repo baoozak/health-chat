@@ -72,7 +72,7 @@
 
 ### 缓存与检索
 - **Redis** - 会话历史缓存 + JWT Token 黑名单
-- **FAISS** - 本地向量数据库，支持全局知识库语义检索
+- **Chroma** - 本地向量数据库，支持全局知识库语义检索
 - **DashScope Embeddings** - 文本向量化（text-embedding-v2）
 
 ### 数据库
@@ -110,7 +110,7 @@ health-chat/
 │   │   ├── 体检指标参考范围.txt
 │   │   ├── 慢性病管理指南.txt
 │   │   └── 营养与饮食指南.txt
-│   ├── vector_stores/       # FAISS 向量库（自动生成）
+│   ├── vector_stores/       # Chroma 向量库（自动生成）
 │   │   └── global/          # 全局知识库
 │   ├── build_knowledge_base.py  # 一键建库脚本
 │   ├── models/              # 数据模型

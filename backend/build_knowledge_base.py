@@ -4,7 +4,7 @@
 
 功能：
   将 knowledge_docs/ 目录下的所有 TXT 文件批量向量化，
-  写入 FAISS 全局知识库（vector_stores/global/）。
+  写入 Chroma 全局知识库（vector_stores/global/）。
 
   知识库建立后，所有用户的对话都会自动检索这些健康知识，
   AI 回答将基于真实的专业文档内容，而非纯粹依赖模型训练知识。
